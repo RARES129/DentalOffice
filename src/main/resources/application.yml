@@ -1,0 +1,26 @@
+spring:
+#  application:
+#    name: DentalOffice
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 201321
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_schema: public
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: fii.pregatit.uaic@gmail.com
+    password: fpfo bzyr ekfv skfv
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
