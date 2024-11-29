@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.validator.constraints.Email;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -17,7 +18,7 @@ public class PatientDTO {
     @NotNull
     private String lastName;
     @NotNull
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     @NotNull
     @Email
     private String email;

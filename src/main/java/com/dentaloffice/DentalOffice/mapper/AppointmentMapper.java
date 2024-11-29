@@ -26,6 +26,9 @@ public class AppointmentMapper {
         if (dto == null) {
             return null;
         }
+        if (patient == null) {
+            throw new IllegalArgumentException("Patient cannot be null");
+        }
         Appointment appointment = new Appointment();
         appointment.setId(dto.getId());
         appointment.setPatient(patient);

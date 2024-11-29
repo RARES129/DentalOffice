@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -23,7 +24,7 @@ public class Appointment {
     private Patient patient;
 
     @Column(nullable = false, length = 255)
-    private Date appointmentDate;
+    private LocalDate appointmentDate;
 
     @Column(nullable = false, length = 255)
     private String reason;

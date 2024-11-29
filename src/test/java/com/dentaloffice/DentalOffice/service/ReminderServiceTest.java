@@ -18,6 +18,7 @@ import com.dentaloffice.DentalOffice.repository.AppointmentRepository;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -50,7 +51,7 @@ public class ReminderServiceTest {
         dummyAppointment = new Appointment();
         dummyAppointment.setId(1L);
         dummyAppointment.setPatient(dummyPatient);
-        dummyAppointment.setAppointmentDate(dateFormat.parse("2024-12-01T14:30:00Z"));
+        dummyAppointment.setAppointmentDate(LocalDate.of(2022, 9, 12));
     }
 
     @Test

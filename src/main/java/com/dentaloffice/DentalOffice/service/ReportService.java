@@ -3,8 +3,10 @@ package com.dentaloffice.DentalOffice.service;
 
 import com.dentaloffice.DentalOffice.dto.ReportDTO;
 import com.dentaloffice.DentalOffice.entity.MedicalNote;
+import com.dentaloffice.DentalOffice.entity.Patient;
 import com.dentaloffice.DentalOffice.repository.AppointmentRepository;
 import com.dentaloffice.DentalOffice.repository.MedicalNoteRepository;
+import com.dentaloffice.DentalOffice.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,19 +22,24 @@ public class ReportService {
     @Autowired
     private MedicalNoteRepository medicalNoteRepository;
 
-    public List<ReportDTO> generateVisitReport() {
-        return appointmentRepository.findAll().stream()
-                .collect(Collectors.groupingBy(appointment -> appointment.getPatient().getId()))
-                .entrySet().stream()
-                .map(entry -> {
-                    ReportDTO report = new ReportDTO();
-                    report.setPatientId(entry.getKey());
-                    report.setPatientName(entry.getValue().get(0).getPatient().getFirstName() + " " + entry.getValue().get(0).getPatient().getLastName());
-                    report.setVisitCount((long) entry.getValue().size());
+    @Autowired
+    private PatientRepository patientRepository;
 
-                    List<MedicalNote> notes = medicalNoteRepository.findByPatientId(entry.getKey());
+    public List<ReportDTO> generateVisitReport() {
+        return patientRepository.findAll().stream()
+                .map(patient -> {
+                    ReportDTO report = new ReportDTO();
+                    report.setPatientId(patient.getId());
+                    report.setPatientName(patient.getFirstName() + " " + patient.getLastName());
+
+                    // Găsește toate programările pentru acest pacient
+                    long visitCount = appointmentRepository.countByPatientId(patient.getId());
+                    report.setVisitCount(visitCount);
+
+                    // Găsește notele medicale ale pacientului
+                    List<MedicalNote> notes = medicalNoteRepository.findByPatientId(patient.getId());
                     List<String> noteDescriptions = notes.stream()
-                            .map(MedicalNote::getNote)  // Assuming a getNote() method exists
+                            .map(MedicalNote::getNote)
                             .collect(Collectors.toList());
                     report.setPatientNotes(noteDescriptions);
 
@@ -41,24 +48,32 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
+
     public ReportDTO generateVisitReportForPatient(Long patientId) {
         if (patientId == null) {
             throw new IllegalArgumentException("Patient ID cannot be null");
         }
 
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new IllegalArgumentException("Patient not found with ID: " + patientId));
+
+        ReportDTO report = new ReportDTO();
+        report.setPatientId(patient.getId());
+        report.setPatientName(patient.getFirstName() + " " + patient.getLastName());
+
+        // Găsește toate programările pentru acest pacient
+        long visitCount = appointmentRepository.countByPatientId(patientId);
+        report.setVisitCount(visitCount);
+
+        // Găsește notele medicale ale pacientului
         List<MedicalNote> notes = medicalNoteRepository.findByPatientId(patientId);
-        return appointmentRepository.findByPatientId(patientId).stream()
-                .collect(Collectors.groupingBy(appointment -> appointment.getPatient().getId()))
-                .entrySet().stream()
-                .map(entry -> {
-                    ReportDTO report = new ReportDTO();
-                    report.setPatientId(entry.getKey());
-                    report.setPatientName(entry.getValue().get(0).getPatient().getFirstName() + " " + entry.getValue().get(0).getPatient().getLastName());
-                    report.setVisitCount((long) entry.getValue().size());
-                    report.setPatientNotes(notes.stream().map(MedicalNote::getNote).collect(Collectors.toList()));
-                    return report;
-                })
-                .findFirst().orElse(null);
+        List<String> noteDescriptions = notes.stream()
+                .map(MedicalNote::getNote)
+                .collect(Collectors.toList());
+        report.setPatientNotes(noteDescriptions);
+
+        return report;
     }
+
 
 }

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -14,7 +15,7 @@ public class AppointmentDTO {
     @NonNull
     private Long patientId;
     @NonNull
-    private Date appointmentDate;
+    private LocalDate appointmentDate;
     @NonNull
     private String reason;
 

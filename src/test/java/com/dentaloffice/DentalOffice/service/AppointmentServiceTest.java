@@ -1,14 +1,17 @@
 package com.dentaloffice.DentalOffice.service;
 
+import com.dentaloffice.DentalOffice.dto.AppointmentDTO;
 import com.dentaloffice.DentalOffice.entity.Appointment;
 import com.dentaloffice.DentalOffice.entity.Patient;
 import com.dentaloffice.DentalOffice.repository.AppointmentRepository;
+import com.dentaloffice.DentalOffice.repository.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -21,10 +24,14 @@ class AppointmentServiceTest {
 
     @Mock
     private AppointmentRepository appointmentRepository;
+    @Mock
+    private PatientRepository patientRepository;
+
 
     @InjectMocks
     private AppointmentService appointmentService;
 
+    private AppointmentDTO dummyAppointmentDTO;
     private Appointment dummyAppointment;
     private Patient dummyPatient;
 
@@ -38,26 +45,71 @@ class AppointmentServiceTest {
         dummyPatient.setFirstName("John");
         dummyPatient.setLastName("Doe");
 
-        // Create dummy appointment
+        dummyAppointmentDTO = new AppointmentDTO();
+        dummyAppointmentDTO.setId(1L);
+        dummyAppointmentDTO.setPatientId(1L);
+        dummyAppointmentDTO.setAppointmentDate(LocalDate.of(2024, 12, 1));
+        dummyAppointmentDTO.setReason("Routine check-up");
+
         dummyAppointment = new Appointment();
         dummyAppointment.setId(1L);
         dummyAppointment.setPatient(dummyPatient);
-        dummyAppointment.setAppointmentDate(new Date());
+        dummyAppointment.setAppointmentDate(LocalDate.of(2024, 12, 1));
         dummyAppointment.setReason("Routine check-up");
+
+        when(patientRepository.findById(1L)).thenReturn(Optional.of(dummyPatient));
+
     }
 
     @Test
     void saveAppointment_Success() {
-        when(appointmentRepository.save(any(Appointment.class))).thenReturn(dummyAppointment);
+        when(appointmentRepository.save(any(Appointment.class))).thenAnswer(invocation -> {
+            Appointment savedAppointment = invocation.getArgument(0);
+            savedAppointment.setId(1L); // Simulează generarea ID-ului
+            return savedAppointment;
+        });
 
-        Appointment result = appointmentService.saveAppointment(dummyAppointment);
+        Appointment result = appointmentService.saveAppointment(dummyAppointmentDTO);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals("Routine check-up", result.getReason());
         assertEquals(1L, result.getPatient().getId());
-        verify(appointmentRepository, times(1)).save(dummyAppointment);
+        verify(patientRepository, times(1)).findById(1L);
+        verify(appointmentRepository, times(1)).save(any(Appointment.class));
     }
+
+    @Test
+    void saveAppointment_PatientNotFound_ThrowsException() {
+        when(patientRepository.findById(2L)).thenReturn(Optional.empty());
+
+        AppointmentDTO appointmentDTO = new AppointmentDTO();
+        appointmentDTO.setPatientId(2L);
+        appointmentDTO.setAppointmentDate(LocalDate.of(2024, 12, 1));
+        appointmentDTO.setReason("Check-up");
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            appointmentService.saveAppointment(appointmentDTO);
+        });
+
+        assertEquals("Patient not found with ID: 2", exception.getMessage());
+        verify(patientRepository, times(1)).findById(2L);
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
+    @Test
+    void saveAppointment_NullPatientId_ThrowsException() {
+        dummyAppointmentDTO.setPatientId(null);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            appointmentService.saveAppointment(dummyAppointmentDTO);
+        });
+
+        assertEquals("Patient not found with ID: null", exception.getMessage());
+        verify(patientRepository, never()).findById(null);
+        verify(appointmentRepository, never()).save(any(Appointment.class));
+    }
+
 
     @Test
     void saveAppointment_NullAppointment_ThrowsException() {

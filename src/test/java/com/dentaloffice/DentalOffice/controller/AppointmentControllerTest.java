@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +45,7 @@ class AppointmentControllerTest {
         dummyAppointment = new Appointment();
         dummyAppointment.setId(1L);
         dummyAppointment.setPatient(dummyPatient);
-        dummyAppointment.setAppointmentDate(new Date());
+        dummyAppointment.setAppointmentDate(LocalDate.of(2002,9,12));
         dummyAppointment.setReason("Routine check-up");
 
         // Create dummy DTO
@@ -53,7 +54,7 @@ class AppointmentControllerTest {
 
     @Test
     void createAppointment_Success() {
-        when(appointmentService.saveAppointment(any(Appointment.class))).thenReturn(dummyAppointment);
+        when(appointmentService.saveAppointment(any(AppointmentDTO.class))).thenReturn(dummyAppointment);
 
         ResponseEntity<AppointmentDTO> response = appointmentController.createAppointment(dummyAppointmentDTO);
 
@@ -61,8 +62,9 @@ class AppointmentControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("Routine check-up", response.getBody().getReason());
         assertEquals(1L, response.getBody().getPatientId());
-        verify(appointmentService, times(1)).saveAppointment(any(Appointment.class));
+        verify(appointmentService, times(1)).saveAppointment(any(AppointmentDTO.class));
     }
+
 
     @Test
     void createAppointment_NullBody_ReturnsBadRequest() {
