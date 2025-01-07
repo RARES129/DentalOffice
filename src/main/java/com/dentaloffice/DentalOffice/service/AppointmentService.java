@@ -70,6 +70,6 @@ public class AppointmentService {
     }
 
     public List<Appointment> getAllAppointments() {
-        return appointmentRepository.findAll();
+        return appointmentRepository.findAllByOrderByAppointmentDateAsc();
     }
 }

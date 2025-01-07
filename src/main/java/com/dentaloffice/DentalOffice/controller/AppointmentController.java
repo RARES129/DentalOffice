@@ -90,7 +90,7 @@ public class AppointmentController {
     @GetMapping
     @Operation(
             summary = "Get all appointments",
-            description = "Retrieve a list of all appointments.",
+            description = "Retrieve a list of all appointments ordered chronologically.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully"),
                     @ApiResponse(responseCode = "404", description = "No appointments found")
@@ -134,7 +134,26 @@ public class AppointmentController {
             summary = "Get today's appointments",
             description = "Retrieve a list of appointments scheduled for today with limited details.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Today's appointments retrieved successfully"),
+                    @ApiResponse(responseCode = "200", description = "Today's appointments retrieved successfully",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = AppointmentDTO.class),
+                                    examples = @ExampleObject(value = """
+                                        [
+                                          {
+                                            "id": 1,
+                                            "patientId": 1,
+                                            "appointmentDate": "2025-01-07",
+                                            "reason": "Routine dental check-up"
+                                          },
+                                          {
+                                            "id": 2,
+                                            "patientId": 2,
+                                            "appointmentDate": "2025-01-07",
+                                            "reason": "Teeth whitening"
+                                          }
+                                        ]
+                                        """)
+                            )),
                     @ApiResponse(responseCode = "404", description = "No appointments found for today")
             }
     )

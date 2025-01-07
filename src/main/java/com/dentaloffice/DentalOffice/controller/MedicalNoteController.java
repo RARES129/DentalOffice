@@ -39,11 +39,13 @@ public class MedicalNoteController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = MedicalNoteDTO.class),
                             examples = @ExampleObject(value = """
-                                {
-                                  "id": null,
-                                  "patientId": 1,
-                                  "note": "Patient diagnosed with mild gingivitis."
-                                }
+                                    {
+                                      "id": 1,
+                                      "patientId": 1,
+                                      "patientFirstName": "Rares",
+                                      "patientLastName": "Dascalu",
+                                      "note": "Patient diagnosed with mild gingivitis."
+                                    }
                                 """))),
             @ApiResponse(responseCode = "400", description = "Invalid request body"),
             @ApiResponse(responseCode = "404", description = "Patient not found")
