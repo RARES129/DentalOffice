@@ -120,43 +120,35 @@ class PatientControllerTest {
 
     @Test
     void getPatientByEmail_Success() {
-        // Prepare a test patient with email
         Patient patient = new Patient();
         patient.setId(1L);
         patient.setFirstName("John");
         patient.setLastName("Doe");
         patient.setEmail("johndoe@example.com");
 
-        // Mock the service call
         when(patientService.getPatientByEmail("johndoe@example.com")).thenReturn(Optional.of(patient));
 
-        // Call the controller method
         ResponseEntity<PatientDTO> response = patientController.getPatientByEmail("johndoe@example.com");
 
-        // Validate the response
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("John", response.getBody().getFirstName());
         assertEquals("Doe", response.getBody().getLastName());
         assertEquals("johndoe@example.com", response.getBody().getEmail());
 
-        // Verify the service call
         verify(patientService, times(1)).getPatientByEmail("johndoe@example.com");
     }
 
     @Test
     void getPatientByEmail_NotFound() {
-        // Mock the service call to return an empty result
+
         when(patientService.getPatientByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
-        // Call the controller method
         ResponseEntity<PatientDTO> response = patientController.getPatientByEmail("nonexistent@example.com");
 
-        // Validate the response
         assertNotNull(response);
         assertEquals(404, response.getStatusCodeValue());
 
-        // Verify the service call
         verify(patientService, times(1)).getPatientByEmail("nonexistent@example.com");
     }
 

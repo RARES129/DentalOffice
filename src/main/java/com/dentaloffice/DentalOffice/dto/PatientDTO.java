@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.validator.constraints.Email;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter

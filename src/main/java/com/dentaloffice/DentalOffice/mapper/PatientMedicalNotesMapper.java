@@ -11,7 +11,7 @@ import java.util.Map;
 public class PatientMedicalNotesMapper {
 
     public static List<PatientMedicalNotesDTO> toPatientMedicalNotesDTO(List<MedicalNote> medicalNotes) {
-        // Group notes by patient ID
+
         Map<Long, PatientMedicalNotesDTO> patientMap = new LinkedHashMap<>();
 
         for (MedicalNote note : medicalNotes) {
@@ -26,7 +26,7 @@ public class PatientMedicalNotesMapper {
                 return dto;
             });
 
-            // Add the note details to the patient's notes
+
             PatientMedicalNotesDTO.NoteDTO noteDTO = new PatientMedicalNotesDTO.NoteDTO();
             noteDTO.setNoteId(note.getId());
             noteDTO.setNoteContent(note.getNote());

@@ -1,9 +1,9 @@
 package com.dentaloffice.DentalOffice.service;
 
+import com.dentaloffice.DentalOffice.dto.PatientMedicalNotesDTO;
 import com.dentaloffice.DentalOffice.entity.MedicalNote;
 import com.dentaloffice.DentalOffice.entity.Patient;
 import com.dentaloffice.DentalOffice.repository.MedicalNoteRepository;
-import com.dentaloffice.DentalOffice.dto.PatientMedicalNotesDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

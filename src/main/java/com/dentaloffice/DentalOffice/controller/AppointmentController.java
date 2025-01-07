@@ -1,6 +1,9 @@
 package com.dentaloffice.DentalOffice.controller;
 
+import com.dentaloffice.DentalOffice.dto.AppointmentDTO;
 import com.dentaloffice.DentalOffice.entity.Appointment;
+import com.dentaloffice.DentalOffice.mapper.AppointmentMapper;
+import com.dentaloffice.DentalOffice.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,12 +11,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.dentaloffice.DentalOffice.service.AppointmentService;
-import com.dentaloffice.DentalOffice.dto.AppointmentDTO;
-import com.dentaloffice.DentalOffice.mapper.AppointmentMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,8 +53,7 @@ public class AppointmentController {
                                             """
                             )
                     )
-            ) @RequestBody AppointmentDTO appointmentDTO) {
-//        System.out.println(appointmentDTO.getPatientId()+" "+appointmentDTO.getAppointmentDate()+" "+appointmentDTO.getReason());
+            ) @Valid @RequestBody AppointmentDTO appointmentDTO) {
         if (appointmentDTO == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -138,21 +138,21 @@ public class AppointmentController {
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = AppointmentDTO.class),
                                     examples = @ExampleObject(value = """
-                                        [
-                                          {
-                                            "id": 1,
-                                            "patientId": 1,
-                                            "appointmentDate": "2025-01-07",
-                                            "reason": "Routine dental check-up"
-                                          },
-                                          {
-                                            "id": 2,
-                                            "patientId": 2,
-                                            "appointmentDate": "2025-01-07",
-                                            "reason": "Teeth whitening"
-                                          }
-                                        ]
-                                        """)
+                                            [
+                                              {
+                                                "id": 1,
+                                                "patientId": 1,
+                                                "appointmentDate": "2025-01-07",
+                                                "reason": "Routine dental check-up"
+                                              },
+                                              {
+                                                "id": 2,
+                                                "patientId": 2,
+                                                "appointmentDate": "2025-01-07",
+                                                "reason": "Teeth whitening"
+                                              }
+                                            ]
+                                            """)
                             )),
                     @ApiResponse(responseCode = "404", description = "No appointments found for today")
             }

@@ -1,5 +1,9 @@
 package com.dentaloffice.DentalOffice.controller;
 
+import com.dentaloffice.DentalOffice.dto.PatientDTO;
+import com.dentaloffice.DentalOffice.entity.Patient;
+import com.dentaloffice.DentalOffice.mapper.PatientMapper;
+import com.dentaloffice.DentalOffice.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -7,13 +11,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.dentaloffice.DentalOffice.dto.PatientDTO;
-import com.dentaloffice.DentalOffice.entity.Patient;
-import com.dentaloffice.DentalOffice.mapper.PatientMapper;
-import com.dentaloffice.DentalOffice.service.PatientService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,16 +41,16 @@ public class PatientController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Patient details for creation",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                {
-                  "firstName": "John",
-                  "lastName": "Doe",
-                  "dateOfBirth": "1990-01-01",
-                  "email": "johndoe@example.com",
-                  "phoneNumber": "1234567890"
-                }
-            """))
+                                {
+                                  "firstName": "John",
+                                  "lastName": "Doe",
+                                  "dateOfBirth": "1990-01-01",
+                                  "email": "johndoe@example.com",
+                                  "phoneNumber": "1234567890"
+                                }
+                            """))
             )
-            @RequestBody PatientDTO patientDTO) {
+            @Valid @RequestBody PatientDTO patientDTO) {
         Patient patient = patientService.savePatient(PatientMapper.toEntity(patientDTO));
         return ResponseEntity.ok(PatientMapper.toDTO(patient));
     }
@@ -110,16 +111,16 @@ public class PatientController {
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Patient details for update",
                     content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                {
-                  "firstName": "Rares",
-                  "lastName": "Dascalu",
-                  "dateOfBirth": "1990-01-01",
-                  "email": "johndoe@example.com",
-                  "phoneNumber": "1234567890"
-                }
-            """))
+                                {
+                                  "firstName": "Rares",
+                                  "lastName": "Dascalu",
+                                  "dateOfBirth": "1990-01-01",
+                                  "email": "johndoe@example.com",
+                                  "phoneNumber": "1234567890"
+                                }
+                            """))
             )
-            @RequestBody PatientDTO patientDTO) {
+            @Valid @RequestBody PatientDTO patientDTO) {
         Patient updatedPatient = patientService.updatePatient(id, PatientMapper.toEntity(patientDTO));
         return ResponseEntity.ok(PatientMapper.toDTO(updatedPatient));
     }

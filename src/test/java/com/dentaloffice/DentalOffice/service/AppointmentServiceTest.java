@@ -13,7 +13,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +38,6 @@ class AppointmentServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Create dummy patient
         dummyPatient = new Patient();
         dummyPatient.setId(1L);
         dummyPatient.setFirstName("John");
@@ -176,7 +174,7 @@ class AppointmentServiceTest {
         appointment2.setAppointmentDate(LocalDate.of(2024, 12, 2));
         appointment2.setReason("Dental cleaning");
 
-        when(appointmentRepository.findAll()).thenReturn(Arrays.asList(appointment1, appointment2));
+        when(appointmentRepository.findAllByOrderByAppointmentDateAsc()).thenReturn(Arrays.asList(appointment1, appointment2));
 
         List<Appointment> result = appointmentService.getAllAppointments();
 
@@ -184,8 +182,10 @@ class AppointmentServiceTest {
         assertEquals(2, result.size());
         assertEquals("Routine check-up", result.get(0).getReason());
         assertEquals("Dental cleaning", result.get(1).getReason());
-        verify(appointmentRepository, times(1)).findAll();
+
+        verify(appointmentRepository, times(1)).findAllByOrderByAppointmentDateAsc();
     }
+
 
     @Test
     void getTodayAppointments_Success() {

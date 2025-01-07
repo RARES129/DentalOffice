@@ -1,14 +1,14 @@
 package com.dentaloffice.DentalOffice.service;
 
-import com.dentaloffice.DentalOffice.dto.MedicalNoteDTO;
+import com.dentaloffice.DentalOffice.dto.PatientMedicalNotesDTO;
 import com.dentaloffice.DentalOffice.entity.MedicalNote;
 import com.dentaloffice.DentalOffice.mapper.PatientMedicalNotesMapper;
+import com.dentaloffice.DentalOffice.repository.MedicalNoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.dentaloffice.DentalOffice.repository.MedicalNoteRepository;
-import com.dentaloffice.DentalOffice.dto.PatientMedicalNotesDTO;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MedicalNoteService {

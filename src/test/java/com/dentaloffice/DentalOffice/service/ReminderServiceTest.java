@@ -1,5 +1,8 @@
 package com.dentaloffice.DentalOffice.service;
 
+import com.dentaloffice.DentalOffice.entity.Appointment;
+import com.dentaloffice.DentalOffice.entity.Patient;
+import com.dentaloffice.DentalOffice.repository.AppointmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,18 +12,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.dentaloffice.DentalOffice.entity.Appointment;
-import com.dentaloffice.DentalOffice.entity.Patient;
-import com.dentaloffice.DentalOffice.repository.AppointmentRepository;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.TimeZone;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ReminderServiceTest {

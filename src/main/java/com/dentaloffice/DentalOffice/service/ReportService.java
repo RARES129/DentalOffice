@@ -32,11 +32,9 @@ public class ReportService {
                     report.setPatientId(patient.getId());
                     report.setPatientName(patient.getFirstName() + " " + patient.getLastName());
 
-                    // Găsește toate programările pentru acest pacient
                     long visitCount = appointmentRepository.countByPatientId(patient.getId());
                     report.setVisitCount(visitCount);
 
-                    // Găsește notele medicale ale pacientului
                     List<MedicalNote> notes = medicalNoteRepository.findByPatientId(patient.getId());
                     List<String> noteDescriptions = notes.stream()
                             .map(MedicalNote::getNote)

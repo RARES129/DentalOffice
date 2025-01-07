@@ -86,34 +86,26 @@ class PatientServiceTest {
         patient.setLastName("Doe");
         patient.setEmail("johndoe@example.com");
 
-        // Mock the service call
         when(patientRepository.findByEmail("johndoe@example.com")).thenReturn(Optional.of(patient));
 
-        // Call the service method
         Optional<Patient> result = patientService.getPatientByEmail("johndoe@example.com");
 
-        // Validate the result
         assertTrue(result.isPresent());
         assertEquals("John", result.get().getFirstName());
         assertEquals("Doe", result.get().getLastName());
         assertEquals("johndoe@example.com", result.get().getEmail());
 
-        // Verify the repository call
         verify(patientRepository, times(1)).findByEmail("johndoe@example.com");
     }
 
     @Test
     void getPatientByEmail_NotFound() {
-        // Mock the repository call to return empty for a non-existing email
         when(patientRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
-        // Call the service method
         Optional<Patient> result = patientService.getPatientByEmail("nonexistent@example.com");
 
-        // Validate the result
         assertFalse(result.isPresent());
 
-        // Verify the repository call
         verify(patientRepository, times(1)).findByEmail("nonexistent@example.com");
     }
 
@@ -127,19 +119,15 @@ class PatientServiceTest {
         patient2.setFirstName("Jane");
         patient2.setLastName("Smith");
 
-        // Mock the repository method to return sorted patients
         when(patientRepository.findAllOrderedByLastName()).thenReturn(Arrays.asList(patient2, patient1));
 
-        // Call the service method
         List<Patient> result = patientService.getAllPatientsOrderedByLastName();
 
-        // Validate the result
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("Smith", result.get(0).getLastName());
         assertEquals("Doe", result.get(1).getLastName());
 
-        // Verify the repository call
         verify(patientRepository, times(1)).findAllOrderedByLastName();
     }
 
@@ -154,19 +142,15 @@ class PatientServiceTest {
         updatedPatient.setFirstName("Rares");
         updatedPatient.setLastName("Dascalu");
 
-        // Mock the repository behavior for finding and saving the updated patient
         when(patientRepository.findById(1L)).thenReturn(Optional.of(existingPatient));
         when(patientRepository.save(existingPatient)).thenReturn(updatedPatient);
 
-        // Call the service method
         Patient result = patientService.updatePatient(1L, updatedPatient);
 
-        // Validate the result
         assertNotNull(result);
         assertEquals("Rares", result.getFirstName());
         assertEquals("Dascalu", result.getLastName());
 
-        // Verify the repository calls
         verify(patientRepository, times(1)).findById(1L);
         verify(patientRepository, times(1)).save(existingPatient);
     }
@@ -178,19 +162,16 @@ class PatientServiceTest {
         updatedPatient.setFirstName("Rares");
         updatedPatient.setLastName("Dascalu");
 
-        // Mock the repository behavior for patient not found
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
+        when(patientRepository.save(updatedPatient)).thenReturn(updatedPatient);
 
-        // Call the service method
         Patient result = patientService.updatePatient(1L, updatedPatient);
 
-        // Validate the result
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Rares", result.getFirstName());
-        assertEquals("Dascalu", result.getLastName());
+        assertNotNull(result, "Result should not be null.");
+        assertEquals(1L, result.getId(), "ID should match the input.");
+        assertEquals("Rares", result.getFirstName(), "First name should match the updated patient's first name.");
+        assertEquals("Dascalu", result.getLastName(), "Last name should match the updated patient's last name.");
 
-        // Verify the repository calls
         verify(patientRepository, times(1)).findById(1L);
         verify(patientRepository, times(1)).save(updatedPatient);
     }

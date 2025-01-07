@@ -1,10 +1,9 @@
 package com.dentaloffice.DentalOffice.service;
 
 import com.dentaloffice.DentalOffice.entity.Patient;
+import com.dentaloffice.DentalOffice.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.dentaloffice.DentalOffice.repository.PatientRepository;
-
 
 import java.util.List;
 import java.util.Optional;

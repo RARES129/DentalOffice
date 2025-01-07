@@ -4,10 +4,10 @@ import com.dentaloffice.DentalOffice.dto.AppointmentDTO;
 import com.dentaloffice.DentalOffice.entity.Appointment;
 import com.dentaloffice.DentalOffice.entity.Patient;
 import com.dentaloffice.DentalOffice.mapper.AppointmentMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.dentaloffice.DentalOffice.repository.AppointmentRepository;
 import com.dentaloffice.DentalOffice.repository.PatientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/medical-notes")
@@ -39,32 +38,32 @@ public class MedicalNoteController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = MedicalNoteDTO.class),
                             examples = @ExampleObject(value = """
-                                    {
-                                      "id": 1,
-                                      "patientId": 1,
-                                      "patientFirstName": "Rares",
-                                      "patientLastName": "Dascalu",
-                                      "note": "Patient diagnosed with mild gingivitis."
-                                    }
-                                """))),
+                                        {
+                                          "id": 1,
+                                          "patientId": 1,
+                                          "patientFirstName": "Rares",
+                                          "patientLastName": "Dascalu",
+                                          "note": "Patient diagnosed with mild gingivitis."
+                                        }
+                                    """))),
             @ApiResponse(responseCode = "400", description = "Invalid request body"),
             @ApiResponse(responseCode = "404", description = "Patient not found")
     })
     public ResponseEntity<MedicalNoteDTO> addMedicalNote(
-            @RequestBody @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Medical note details",
-            required = true,
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = MedicalNoteDTO.class),
-                    examples = @ExampleObject(value = """
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Medical note details",
+                    required = true,
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MedicalNoteDTO.class),
+                            examples = @ExampleObject(value = """
                                     {
                                       "patientId": 1,
                                       "note": "Patient diagnosed with mild gingivitis."
                                     }
                                     """)))
-                                                              MedicalNoteDTO medicalNoteDTO) {
+            @RequestBody MedicalNoteDTO medicalNoteDTO) {
         if (medicalNoteDTO == null) {
-            return ResponseEntity.badRequest().body(null);  // Return 400 Bad Request directly
+            return ResponseEntity.badRequest().body(null);
         }
         return patientService.getPatientById(medicalNoteDTO.getPatientId())
                 .map(patient -> {
@@ -72,9 +71,8 @@ public class MedicalNoteController {
                     MedicalNote savedMedicalNote = medicalNoteService.saveMedicalNote(medicalNote);
                     return ResponseEntity.ok(MedicalNoteMapper.toDTO(savedMedicalNote));
                 })
-                .orElseGet(() -> ResponseEntity.notFound().build());  // Handle patient not found
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 
 
     @GetMapping("/{id}")
@@ -84,14 +82,14 @@ public class MedicalNoteController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = MedicalNoteDTO.class),
                             examples = @ExampleObject(value = """
-                                {
-                                  "id": 1,
-                                  "patientId": 1,
-                                  "firstName": "John",
-                                  "lastName": "Doe",
-                                  "note": "Patient diagnosed with mild gingivitis."
-                                }
-                                """))),
+                                    {
+                                      "id": 1,
+                                      "patientId": 1,
+                                      "firstName": "John",
+                                      "lastName": "Doe",
+                                      "note": "Patient diagnosed with mild gingivitis."
+                                    }
+                                    """))),
             @ApiResponse(responseCode = "400", description = "Invalid ID provided"),
             @ApiResponse(responseCode = "404", description = "Medical note not found")
     })
@@ -111,21 +109,21 @@ public class MedicalNoteController {
             @ApiResponse(responseCode = "200", description = "Medical notes retrieved successfully",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
-                                  {
-                                    "id": 1,
-                                    "patientId": 1,
-                                    "firstName": "John",
-                                    "lastName": "Doe",
-                                    "note": "Patient diagnosed with mild gingivitis."
-                                  },
-                                """))),
+                                      {
+                                        "id": 1,
+                                        "patientId": 1,
+                                        "firstName": "John",
+                                        "lastName": "Doe",
+                                        "note": "Patient diagnosed with mild gingivitis."
+                                      },
+                                    """))),
             @ApiResponse(responseCode = "400", description = "Invalid patient ID provided"),
             @ApiResponse(responseCode = "404", description = "Patient not found")
     })
     public ResponseEntity<List<PatientMedicalNotesDTO>> getMedicalNotesByPatientId(
             @Parameter(description = "ID of the patient", example = "1") @PathVariable Long id) {
         if (id == null) {
-            return ResponseEntity.badRequest().build();  // Directly return bad request on null id
+            return ResponseEntity.badRequest().build();
         }
         try {
             List<PatientMedicalNotesDTO> notes = medicalNoteService.getMedicalNotesByPatientId(id);
@@ -141,23 +139,23 @@ public class MedicalNoteController {
             @ApiResponse(responseCode = "200", description = "Medical notes retrieved successfully",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
-                                [
-                                  {
-                                    "id": 1,
-                                    "patientId": 1,
-                                    "firstName": "John",
-                                    "lastName": "Doe",
-                                    "note": "Patient diagnosed with mild gingivitis."
-                                  },
-                                  {
-                                    "id": 2,
-                                    "patientId": 2,
-                                    "firstName": "Jane",
-                                    "lastName": "Smith",
-                                    "note": "Patient shows improvement after treatment."
-                                  }
-                                ]
-                                """))),
+                                    [
+                                      {
+                                        "id": 1,
+                                        "patientId": 1,
+                                        "firstName": "John",
+                                        "lastName": "Doe",
+                                        "note": "Patient diagnosed with mild gingivitis."
+                                      },
+                                      {
+                                        "id": 2,
+                                        "patientId": 2,
+                                        "firstName": "Jane",
+                                        "lastName": "Smith",
+                                        "note": "Patient shows improvement after treatment."
+                                      }
+                                    ]
+                                    """))),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<List<PatientMedicalNotesDTO>> getAllMedicalNotes() {

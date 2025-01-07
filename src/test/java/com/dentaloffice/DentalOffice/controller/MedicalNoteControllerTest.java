@@ -7,7 +7,6 @@ import com.dentaloffice.DentalOffice.entity.Patient;
 import com.dentaloffice.DentalOffice.mapper.MedicalNoteMapper;
 import com.dentaloffice.DentalOffice.service.MedicalNoteService;
 import com.dentaloffice.DentalOffice.service.PatientService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

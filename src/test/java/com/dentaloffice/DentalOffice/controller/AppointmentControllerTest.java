@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +44,7 @@ class AppointmentControllerTest {
         dummyAppointment = new Appointment();
         dummyAppointment.setId(1L);
         dummyAppointment.setPatient(dummyPatient);
-        dummyAppointment.setAppointmentDate(LocalDate.of(2002,9,12));
+        dummyAppointment.setAppointmentDate(LocalDate.of(2002, 9, 12));
         dummyAppointment.setReason("Routine check-up");
 
         // Create dummy DTO
@@ -77,7 +76,6 @@ class AppointmentControllerTest {
         assertEquals(400, response.getStatusCodeValue());  // Check for bad request status
         verify(appointmentService, times(1)).saveAppointment(any(AppointmentDTO.class));
     }
-
 
 
     @Test
@@ -170,14 +168,13 @@ class AppointmentControllerTest {
 
     @Test
     void getAllAppointments_NoAppointments_ReturnsNotFound() {
-        // Simulate that the service returns an empty list
         when(appointmentService.getAllAppointments()).thenReturn(Arrays.asList());
 
         ResponseEntity<List<AppointmentDTO>> response = appointmentController.getAllAppointments();
 
         assertNotNull(response);
-        assertEquals(404, response.getStatusCodeValue());  // Expecting Not Found status
-        assertNull(response.getBody());  // No body should be returned
+        assertEquals(404, response.getStatusCodeValue());
+        assertNull(response.getBody());
         verify(appointmentService, times(1)).getAllAppointments();
     }
 
