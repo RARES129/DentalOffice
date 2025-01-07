@@ -46,4 +46,12 @@ public class PatientService {
                     return patientRepository.save(updatedPatient);
                 });
     }
+
+    public Optional<Patient> getPatientByEmail(String email) {
+        return patientRepository.findByEmail(email);
+    }
+
+    public List<Patient> getAllPatientsOrderedByLastName() {
+        return patientRepository.findAllOrderedByLastName();
+    }
 }

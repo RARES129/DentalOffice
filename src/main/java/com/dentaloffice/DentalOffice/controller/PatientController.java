@@ -77,14 +77,15 @@ public class PatientController {
 
     @GetMapping
     @Operation(
-            summary = "Get all patients",
-            description = "Retrieve a list of all registered patients.",
+            summary = "Get all patients in alphabetical order",
+            description = "Retrieve a list of all registered patients in alphabetical order.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "List of patients retrieved successfully")
             }
     )
-    public ResponseEntity<List<PatientDTO>> getAllPatients() {
-        List<PatientDTO> patients = patientService.getAllPatients().stream()
+    public ResponseEntity<List<PatientDTO>> getAllPatientsSorted() {
+        List<PatientDTO> patients = patientService.getAllPatientsOrderedByLastName()
+                .stream()
                 .map(PatientMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(patients);
@@ -123,6 +124,28 @@ public class PatientController {
         return ResponseEntity.ok(PatientMapper.toDTO(updatedPatient));
     }
 
+    @GetMapping("/email/{email}")
+    @Operation(
+            summary = "Get patient by email",
+            description = "Retrieve details of a patient by their email address.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Patient retrieved successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PatientDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Patient not found")
+            }
+    )
+    public ResponseEntity<PatientDTO> getPatientByEmail(
+            @Parameter(
+                    description = "Email of the patient to retrieve",
+                    example = "johndoe@example.com"
+            )
+            @PathVariable String email) {
+        return patientService.getPatientByEmail(email)
+                .map(patient -> ResponseEntity.ok(PatientMapper.toDTO(patient)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
     @DeleteMapping("/{id}")
     @Operation(
             summary = "Delete a patient",
@@ -141,4 +164,6 @@ public class PatientController {
         patientService.deletePatient(id);
         return ResponseEntity.ok().build();
     }
+
+
 }

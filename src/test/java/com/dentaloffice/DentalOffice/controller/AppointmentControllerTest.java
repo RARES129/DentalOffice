@@ -65,6 +65,20 @@ class AppointmentControllerTest {
         verify(appointmentService, times(1)).saveAppointment(any(AppointmentDTO.class));
     }
 
+    @Test
+    void createAppointment_IllegalArgumentException_ReturnsBadRequest() {
+        // Simulate IllegalArgumentException thrown from the service
+        when(appointmentService.saveAppointment(any(AppointmentDTO.class)))
+                .thenThrow(new IllegalArgumentException("Invalid appointment"));
+
+        ResponseEntity<AppointmentDTO> response = appointmentController.createAppointment(dummyAppointmentDTO);
+
+        assertNotNull(response);
+        assertEquals(400, response.getStatusCodeValue());  // Check for bad request status
+        verify(appointmentService, times(1)).saveAppointment(any(AppointmentDTO.class));
+    }
+
+
 
     @Test
     void createAppointment_NullBody_ReturnsBadRequest() {
@@ -139,4 +153,60 @@ class AppointmentControllerTest {
         assertEquals(400, response.getStatusCodeValue());
         verify(appointmentService, never()).deleteAppointment(any());
     }
+
+    @Test
+    void getAllAppointments_Success() {
+        when(appointmentService.getAllAppointments()).thenReturn(Arrays.asList(dummyAppointment));
+
+        ResponseEntity<List<AppointmentDTO>> response = appointmentController.getAllAppointments();
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().size());
+        assertEquals("Routine check-up", response.getBody().get(0).getReason());
+        assertEquals(1L, response.getBody().get(0).getPatientId());
+        verify(appointmentService, times(1)).getAllAppointments();
+    }
+
+    @Test
+    void getAllAppointments_NoAppointments_ReturnsNotFound() {
+        // Simulate that the service returns an empty list
+        when(appointmentService.getAllAppointments()).thenReturn(Arrays.asList());
+
+        ResponseEntity<List<AppointmentDTO>> response = appointmentController.getAllAppointments();
+
+        assertNotNull(response);
+        assertEquals(404, response.getStatusCodeValue());  // Expecting Not Found status
+        assertNull(response.getBody());  // No body should be returned
+        verify(appointmentService, times(1)).getAllAppointments();
+    }
+
+
+    @Test
+    void getTodayAppointments_Success() {
+        List<AppointmentDTO> appointmentDTOList = Arrays.asList(dummyAppointmentDTO);
+        when(appointmentService.getTodayAppointments()).thenReturn(appointmentDTOList);
+
+        ResponseEntity<?> response = appointmentController.getTodayAppointments();
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, ((List<AppointmentDTO>) response.getBody()).size());
+        assertEquals("Routine check-up", ((List<AppointmentDTO>) response.getBody()).get(0).getReason());
+        verify(appointmentService, times(1)).getTodayAppointments();
+    }
+
+    @Test
+    void getTodayAppointments_NoAppointments_ReturnsNotFound() {
+        when(appointmentService.getTodayAppointments()).thenReturn(Arrays.asList());
+
+        ResponseEntity<?> response = appointmentController.getTodayAppointments();
+
+        assertNotNull(response);
+        assertEquals(404, response.getStatusCodeValue());
+        assertEquals("No appointments today.", response.getBody());
+        verify(appointmentService, times(1)).getTodayAppointments();
+    }
+
+
 }

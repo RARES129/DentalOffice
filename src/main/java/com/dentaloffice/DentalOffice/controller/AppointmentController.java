@@ -92,15 +92,22 @@ public class AppointmentController {
             summary = "Get all appointments",
             description = "Retrieve a list of all appointments.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully")
+                    @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "No appointments found")
             }
     )
     public ResponseEntity<List<AppointmentDTO>> getAllAppointments() {
         List<AppointmentDTO> appointments = appointmentService.getAllAppointments().stream()
                 .map(AppointmentMapper::toDTO)
                 .collect(Collectors.toList());
+
+        if (appointments.isEmpty()) {
+            return ResponseEntity.status(404).body(null);  // No appointments found
+        }
+
         return ResponseEntity.ok(appointments);
     }
+
 
     @GetMapping("/patient/{patientId}")
     @Operation(
@@ -121,6 +128,24 @@ public class AppointmentController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(appointments);
     }
+
+    @GetMapping("/today")
+    @Operation(
+            summary = "Get today's appointments",
+            description = "Retrieve a list of appointments scheduled for today with limited details.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Today's appointments retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "No appointments found for today")
+            }
+    )
+    public ResponseEntity<?> getTodayAppointments() {
+        List<AppointmentDTO> appointments = appointmentService.getTodayAppointments();
+        if (appointments.isEmpty()) {
+            return ResponseEntity.status(404).body("No appointments today.");
+        }
+        return ResponseEntity.ok(appointments);
+    }
+
 
     @DeleteMapping("/{id}")
     @Operation(

@@ -1,7 +1,9 @@
 package com.dentaloffice.DentalOffice.service;
 
 import com.dentaloffice.DentalOffice.entity.MedicalNote;
+import com.dentaloffice.DentalOffice.entity.Patient;
 import com.dentaloffice.DentalOffice.repository.MedicalNoteRepository;
+import com.dentaloffice.DentalOffice.dto.PatientMedicalNotesDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -9,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,79 +26,97 @@ class MedicalNoteServiceTest {
     @InjectMocks
     private MedicalNoteService medicalNoteService;
 
-    private MedicalNote dummyNote;
+    private Patient patient;
+    private MedicalNote medicalNote;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        dummyNote = new MedicalNote();
-        dummyNote.setId(1L);
-        dummyNote.setNote("This is a medical note.");
+
+        patient = new Patient();
+        patient.setId(1L);
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+
+        medicalNote = new MedicalNote();
+        medicalNote.setId(1L);
+        medicalNote.setNote("Test Note");
+        medicalNote.setPatient(patient);
     }
 
     @Test
     void saveMedicalNote_Success() {
-        when(medicalNoteRepository.save(any(MedicalNote.class))).thenReturn(dummyNote);
+        when(medicalNoteRepository.save(medicalNote)).thenReturn(medicalNote);
 
-        MedicalNote result = medicalNoteService.saveMedicalNote(dummyNote);
+        MedicalNote result = medicalNoteService.saveMedicalNote(medicalNote);
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
-        verify(medicalNoteRepository, times(1)).save(dummyNote);
+        verify(medicalNoteRepository, times(1)).save(medicalNote);
     }
 
     @Test
     void saveMedicalNote_NullMedicalNote_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> medicalNoteService.saveMedicalNote(null),
-                "MedicalNote cannot be null");
+        assertThrows(IllegalArgumentException.class,
+                () -> medicalNoteService.saveMedicalNote(null),
+                "Expected IllegalArgumentException for null MedicalNote"
+        );
     }
 
     @Test
     void getMedicalNoteById_Success() {
-        when(medicalNoteRepository.findById(1L)).thenReturn(Optional.of(dummyNote));
+        when(medicalNoteRepository.findById(1L)).thenReturn(Optional.of(medicalNote));
 
         Optional<MedicalNote> result = medicalNoteService.getMedicalNoteById(1L);
 
         assertTrue(result.isPresent());
-        assertEquals("This is a medical note.", result.get().getNote());
+        assertEquals(1L, result.get().getId());
         verify(medicalNoteRepository, times(1)).findById(1L);
     }
 
     @Test
-    void getMedicalNoteById_NullId_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> medicalNoteService.getMedicalNoteById(null),
-                "MedicalNote ID cannot be null");
+    void getMedicalNoteById_NotFound() {
+        when(medicalNoteRepository.findById(2L)).thenReturn(Optional.empty());
+
+        Optional<MedicalNote> result = medicalNoteService.getMedicalNoteById(2L);
+
+        assertFalse(result.isPresent());
+        verify(medicalNoteRepository, times(1)).findById(2L);
     }
 
     @Test
     void getMedicalNotesByPatientId_Success() {
-        Long patientId = 1L;
-        MedicalNote medicalNote = new MedicalNote(); // Assuming constructor and setters
-        when(medicalNoteRepository.findByPatientId(patientId)).thenReturn(Arrays.asList(medicalNote));
+        when(medicalNoteRepository.findByPatientId(1L)).thenReturn(Arrays.asList(medicalNote));
 
-        List<MedicalNote> result = medicalNoteService.getMedicalNotesByPatientId(patientId);
-        assertFalse(result.isEmpty());
+        List<PatientMedicalNotesDTO> result = medicalNoteService.getMedicalNotesByPatientId(1L);
+
+        assertNotNull(result);
         assertEquals(1, result.size());
-        verify(medicalNoteRepository).findByPatientId(patientId);
+        assertEquals("John", result.get(0).getFirstName());
+        verify(medicalNoteRepository, times(1)).findByPatientId(1L);
     }
 
     @Test
-    void getMedicalNotesByPatientId_NullPatientId_ThrowsIllegalArgumentException() {
-        Long patientId = null;
-        assertThrows(IllegalArgumentException.class, () -> {
-            medicalNoteService.getMedicalNotesByPatientId(patientId);
-        });
+    void getMedicalNotesByPatientId_EmptyList() {
+        when(medicalNoteRepository.findByPatientId(1L)).thenReturn(Collections.emptyList());
+
+        List<PatientMedicalNotesDTO> result = medicalNoteService.getMedicalNotesByPatientId(1L);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(medicalNoteRepository, times(1)).findByPatientId(1L);
     }
 
-
     @Test
-    void getAllMedicalNotes_Success() {
-        when(medicalNoteRepository.findAll()).thenReturn(Arrays.asList(dummyNote));
+    void getAllMedicalNotesOrderedByPatientLastName_Success() {
+        when(medicalNoteRepository.findAllOrderedByPatientLastName()).thenReturn(Arrays.asList(medicalNote));
 
-        List<MedicalNote> result = medicalNoteService.getAllMedicalNotes();
+        List<PatientMedicalNotesDTO> result = medicalNoteService.getAllMedicalNotesOrderedByPatientLastName();
 
+        assertNotNull(result);
         assertEquals(1, result.size());
-        verify(medicalNoteRepository, times(1)).findAll();
+        assertEquals("Doe", result.get(0).getLastName());
+        verify(medicalNoteRepository, times(1)).findAllOrderedByPatientLastName();
     }
 
     @Test
@@ -109,7 +130,9 @@ class MedicalNoteServiceTest {
 
     @Test
     void deleteMedicalNote_NullId_ThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> medicalNoteService.deleteMedicalNote(null),
-                "MedicalNote ID cannot be null");
+        assertThrows(IllegalArgumentException.class,
+                () -> medicalNoteService.deleteMedicalNote(null),
+                "Expected IllegalArgumentException for null ID"
+        );
     }
 }

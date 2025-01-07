@@ -1,6 +1,7 @@
 package com.dentaloffice.DentalOffice.controller;
 
 import com.dentaloffice.DentalOffice.dto.MedicalNoteDTO;
+import com.dentaloffice.DentalOffice.dto.PatientMedicalNotesDTO;
 import com.dentaloffice.DentalOffice.entity.MedicalNote;
 import com.dentaloffice.DentalOffice.mapper.MedicalNoteMapper;
 import com.dentaloffice.DentalOffice.service.MedicalNoteService;
@@ -84,6 +85,8 @@ public class MedicalNoteController {
                                 {
                                   "id": 1,
                                   "patientId": 1,
+                                  "firstName": "John",
+                                  "lastName": "Doe",
                                   "note": "Patient diagnosed with mild gingivitis."
                                 }
                                 """))),
@@ -109,30 +112,29 @@ public class MedicalNoteController {
                                   {
                                     "id": 1,
                                     "patientId": 1,
+                                    "firstName": "John",
+                                    "lastName": "Doe",
                                     "note": "Patient diagnosed with mild gingivitis."
                                   },
                                 """))),
             @ApiResponse(responseCode = "400", description = "Invalid patient ID provided"),
             @ApiResponse(responseCode = "404", description = "Patient not found")
     })
-    public ResponseEntity<List<MedicalNoteDTO>> getMedicalNotesByPatientId(
+    public ResponseEntity<List<PatientMedicalNotesDTO>> getMedicalNotesByPatientId(
             @Parameter(description = "ID of the patient", example = "1") @PathVariable Long id) {
         if (id == null) {
             return ResponseEntity.badRequest().build();  // Directly return bad request on null id
         }
         try {
-            List<MedicalNote> medicalNotes = medicalNoteService.getMedicalNotesByPatientId(id);
-            List<MedicalNoteDTO> medicalNoteDTOs = medicalNotes.stream()
-                    .map(MedicalNoteMapper::toDTO)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(medicalNoteDTOs);
+            List<PatientMedicalNotesDTO> notes = medicalNoteService.getMedicalNotesByPatientId(id);
+            return ResponseEntity.ok(notes);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping
-    @Operation(summary = "Get all medical notes", description = "Retrieve all medical notes in the system")
+    @Operation(summary = "Get all medical notes", description = "Retrieve all medical notes ordered by patient last name")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Medical notes retrieved successfully",
                     content = @Content(mediaType = "application/json",
@@ -141,26 +143,23 @@ public class MedicalNoteController {
                                   {
                                     "id": 1,
                                     "patientId": 1,
+                                    "firstName": "John",
+                                    "lastName": "Doe",
                                     "note": "Patient diagnosed with mild gingivitis."
                                   },
                                   {
                                     "id": 2,
                                     "patientId": 2,
+                                    "firstName": "Jane",
+                                    "lastName": "Smith",
                                     "note": "Patient shows improvement after treatment."
                                   }
                                 ]
                                 """))),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<List<MedicalNoteDTO>> getAllMedicalNotes() {
-        List<MedicalNoteDTO> notes = medicalNoteService.getAllMedicalNotes().stream()
-                .map(note -> {
-                    if (note == null) {
-                        throw new IllegalStateException("Note is null during mapping");
-                    }
-                    return MedicalNoteMapper.toDTO(note);
-                })
-                .collect(Collectors.toList());
+    public ResponseEntity<List<PatientMedicalNotesDTO>> getAllMedicalNotes() {
+        List<PatientMedicalNotesDTO> notes = medicalNoteService.getAllMedicalNotesOrderedByPatientLastName();
         return ResponseEntity.ok(notes);
     }
 

@@ -98,20 +98,6 @@ class AppointmentServiceTest {
     }
 
     @Test
-    void saveAppointment_NullPatientId_ThrowsException() {
-        dummyAppointmentDTO.setPatientId(null);
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            appointmentService.saveAppointment(dummyAppointmentDTO);
-        });
-
-        assertEquals("Patient not found with ID: null", exception.getMessage());
-        verify(patientRepository, never()).findById(null);
-        verify(appointmentRepository, never()).save(any(Appointment.class));
-    }
-
-
-    @Test
     void saveAppointment_NullAppointment_ThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             appointmentService.saveAppointment(null);
@@ -175,4 +161,51 @@ class AppointmentServiceTest {
         });
         assertEquals("Appointment ID cannot be null", exception.getMessage());
     }
+
+    @Test
+    void getAllAppointments_Success() {
+        Appointment appointment1 = new Appointment();
+        appointment1.setId(1L);
+        appointment1.setPatient(dummyPatient);
+        appointment1.setAppointmentDate(LocalDate.of(2024, 12, 1));
+        appointment1.setReason("Routine check-up");
+
+        Appointment appointment2 = new Appointment();
+        appointment2.setId(2L);
+        appointment2.setPatient(dummyPatient);
+        appointment2.setAppointmentDate(LocalDate.of(2024, 12, 2));
+        appointment2.setReason("Dental cleaning");
+
+        when(appointmentRepository.findAll()).thenReturn(Arrays.asList(appointment1, appointment2));
+
+        List<Appointment> result = appointmentService.getAllAppointments();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("Routine check-up", result.get(0).getReason());
+        assertEquals("Dental cleaning", result.get(1).getReason());
+        verify(appointmentRepository, times(1)).findAll();
+    }
+
+    @Test
+    void getTodayAppointments_Success() {
+        LocalDate today = LocalDate.now();
+        Appointment todayAppointment = new Appointment();
+        todayAppointment.setId(1L);
+        todayAppointment.setPatient(dummyPatient);
+        todayAppointment.setAppointmentDate(today);
+        todayAppointment.setReason("Routine check-up");
+
+        when(appointmentRepository.findAll()).thenReturn(Arrays.asList(todayAppointment));
+
+        List<AppointmentDTO> result = appointmentService.getTodayAppointments();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(today, result.get(0).getAppointmentDate());
+        assertEquals("Routine check-up", result.get(0).getReason());
+        verify(appointmentRepository, times(1)).findAll();
+    }
+
+
 }

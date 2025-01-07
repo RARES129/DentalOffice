@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import com.dentaloffice.DentalOffice.repository.AppointmentRepository;
 import com.dentaloffice.DentalOffice.repository.PatientRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService {
@@ -51,6 +53,20 @@ public class AppointmentService {
             throw new IllegalArgumentException("Appointment ID cannot be null");
         }
         appointmentRepository.deleteById(id);
+    }
+
+    public List<AppointmentDTO> getTodayAppointments() {
+        LocalDate today = LocalDate.now();
+        return appointmentRepository.findAll().stream()
+                .filter(appointment -> today.equals(appointment.getAppointmentDate()))
+                .map(appointment -> {
+                    AppointmentDTO dto = new AppointmentDTO();
+                    dto.setId(appointment.getId());
+                    dto.setPatientId(appointment.getPatient().getId());
+                    dto.setAppointmentDate(appointment.getAppointmentDate());
+                    dto.setReason(appointment.getReason());
+                    return dto;
+                }).collect(Collectors.toList());
     }
 
     public List<Appointment> getAllAppointments() {

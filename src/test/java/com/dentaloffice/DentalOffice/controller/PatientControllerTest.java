@@ -67,16 +67,18 @@ class PatientControllerTest {
     void getAllPatients() {
         Patient patient1 = new Patient();
         patient1.setFirstName("John");
+        patient1.setLastName("Doe");
         Patient patient2 = new Patient();
         patient2.setFirstName("Jane");
+        patient2.setLastName("Doe");
 
-        when(patientService.getAllPatients()).thenReturn(Arrays.asList(patient1, patient2));
+        when(patientService.getAllPatientsOrderedByLastName()).thenReturn(Arrays.asList(patient1, patient2));
 
-        ResponseEntity<List<PatientDTO>> response = patientController.getAllPatients();
+        ResponseEntity<List<PatientDTO>> response = patientController.getAllPatientsSorted();
 
         assertNotNull(response);
         assertEquals(2, response.getBody().size());
-        verify(patientService, times(1)).getAllPatients();
+        verify(patientService, times(1)).getAllPatientsOrderedByLastName();
     }
 
     @Test
@@ -87,4 +89,75 @@ class PatientControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         verify(patientService, times(1)).deletePatient(1L);
     }
+
+    @Test
+    void updatePatient_Success() {
+        // Create a dummy patient DTO to be updated
+        PatientDTO patientDTO = new PatientDTO();
+        patientDTO.setFirstName("Rares");
+        patientDTO.setLastName("Dascalu");
+
+        Patient existingPatient = new Patient();
+        existingPatient.setId(1L);
+        existingPatient.setFirstName("John");
+        existingPatient.setLastName("Doe");
+
+        Patient updatedPatient = new Patient();
+        updatedPatient.setId(1L);
+        updatedPatient.setFirstName("Rares");
+        updatedPatient.setLastName("Dascalu");
+
+        when(patientService.updatePatient(eq(1L), any(Patient.class))).thenReturn(updatedPatient);
+
+        ResponseEntity<PatientDTO> response = patientController.updatePatient(1L, patientDTO);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Rares", response.getBody().getFirstName());
+        assertEquals("Dascalu", response.getBody().getLastName());
+        verify(patientService, times(1)).updatePatient(eq(1L), any(Patient.class));
+    }
+
+    @Test
+    void getPatientByEmail_Success() {
+        // Prepare a test patient with email
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+        patient.setEmail("johndoe@example.com");
+
+        // Mock the service call
+        when(patientService.getPatientByEmail("johndoe@example.com")).thenReturn(Optional.of(patient));
+
+        // Call the controller method
+        ResponseEntity<PatientDTO> response = patientController.getPatientByEmail("johndoe@example.com");
+
+        // Validate the response
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("John", response.getBody().getFirstName());
+        assertEquals("Doe", response.getBody().getLastName());
+        assertEquals("johndoe@example.com", response.getBody().getEmail());
+
+        // Verify the service call
+        verify(patientService, times(1)).getPatientByEmail("johndoe@example.com");
+    }
+
+    @Test
+    void getPatientByEmail_NotFound() {
+        // Mock the service call to return an empty result
+        when(patientService.getPatientByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+
+        // Call the controller method
+        ResponseEntity<PatientDTO> response = patientController.getPatientByEmail("nonexistent@example.com");
+
+        // Validate the response
+        assertNotNull(response);
+        assertEquals(404, response.getStatusCodeValue());
+
+        // Verify the service call
+        verify(patientService, times(1)).getPatientByEmail("nonexistent@example.com");
+    }
+
 }

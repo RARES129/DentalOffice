@@ -13,6 +13,8 @@ public class MedicalNoteMapper {
         MedicalNoteDTO dto = new MedicalNoteDTO();
         dto.setId(medicalNote.getId());
         dto.setPatientId(medicalNote.getPatient().getId());
+        dto.setPatientFirstName(medicalNote.getPatient().getFirstName());
+        dto.setPatientLastName(medicalNote.getPatient().getLastName());
         dto.setNote(medicalNote.getNote());
         return dto;
     }

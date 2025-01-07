@@ -11,6 +11,13 @@ public class MedicalNoteDTO {
     private Long id;
     @NotNull
     private Long patientId;
+
+    @NotNull
+    private String patientFirstName;
+
+    @NotNull
+    private String patientLastName;
+
     @NotNull
     private String note;
 }
