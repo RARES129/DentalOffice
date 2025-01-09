@@ -58,12 +58,10 @@ public class ReportService {
         ReportDTO report = new ReportDTO();
         report.setPatientId(patient.getId());
         report.setPatientName(patient.getFirstName() + " " + patient.getLastName());
-
-        // Găsește toate programările pentru acest pacient
+        
         long visitCount = appointmentRepository.countByPatientId(patientId);
         report.setVisitCount(visitCount);
 
-        // Găsește notele medicale ale pacientului
         List<MedicalNote> notes = medicalNoteRepository.findByPatientId(patientId);
         List<String> noteDescriptions = notes.stream()
                 .map(MedicalNote::getNote)
